@@ -25,3 +25,17 @@
 ## 目标用户
 
 面向需要情感支持和恋爱指导的广大用户群体，帮助用户更好地处理感情问题，提升情感智慧。
+
+## 技术栈
+
+后端技术
+核心框架: Spring Boot 3.x + Spring AI
+编程语言: Java 17+
+构建工具: Maven 3.8+
+对象序列化: Kryo (用于FileBasedChatMemory)
+日志框架: SLF4J + Logback
+代码简化: Lombok
+AI集成
+大语言模型: 阿里云DashScope API
+对话管理: ChatClient (Spring AI组件)
+对话记忆: ChatMemory接口及其实现FileBasedChatMemory
