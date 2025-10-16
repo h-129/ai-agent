@@ -38,15 +38,27 @@ public class MyLoggerAdvisor implements CallAroundAdvisor, StreamAroundAdvisor {
         log.info("AI response: {}", advisedResponse.response().getResult().getOutput().getText());
     }
 
+    /**
+     * 在处理请求之后执行
+     *
+     * @param advisedRequest AdvisedRequest
+     * @param chain          CallAroundAdvisorChain
+     * @return AdvisedResponse
+     */
     public AdvisedResponse aroundCall(AdvisedRequest advisedRequest, CallAroundAdvisorChain chain) {
-        advisedRequest = this.before(advisedRequest);
         AdvisedResponse advisedResponse = chain.nextAroundCall(advisedRequest);
         this.observeAfter(advisedResponse);
         return advisedResponse;
     }
 
+    /**
+     * 在处理请求之后执行
+     *
+     * @param advisedRequest AdvisedRequest
+     * @param chain          StreamAroundAdvisorChain
+     * @return Flux<AdvisedResponse>
+     */
     public Flux<AdvisedResponse> aroundStream(AdvisedRequest advisedRequest, StreamAroundAdvisorChain chain) {
-        advisedRequest = this.before(advisedRequest);
         Flux<AdvisedResponse> advisedResponses = chain.nextAroundStream(advisedRequest);
         return (new MessageAggregator()).aggregateAdvisedResponse(advisedResponses, this::observeAfter);
     }

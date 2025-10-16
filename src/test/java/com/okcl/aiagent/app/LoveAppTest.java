@@ -4,8 +4,11 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @SpringBootTest
@@ -13,6 +16,8 @@ import java.util.UUID;
 class LoveAppTest {
     @Resource
     private LoveApp loveApp;
+    @Value("classpath:templates/system-prompt.st")
+    private org.springframework.core.io.Resource systemPromptResource;
 
     @Test
     void contextLoads() {
@@ -31,11 +36,16 @@ class LoveAppTest {
     }
 
     @Test
-    void doChatWithReport() {
+    void doChatWithReport() throws IOException {
         String message = "我叫小王,现在单身,想找对象,希望对象能给我一个好听的名字";
         String chatId = UUID.randomUUID().toString();
         log.info("请求id:{}", chatId);
         LoveApp.LoveReport loveReport = loveApp.doChatWithReport(message, chatId);
         Assertions.assertNotNull(loveReport);
+    }
+
+    @Test
+    void loadSource() throws IOException {
+        log.info("Loaded system prompt from {}", systemPromptResource.getContentAsString(StandardCharsets.UTF_8));
     }
 }
