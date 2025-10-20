@@ -1,6 +1,7 @@
 package com.okcl.aiagent.app;
 
 import com.okcl.aiagent.advisor.MyLoggerAdvisor;
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -11,8 +12,11 @@ import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 import static org.springframework.ai.chat.client.advisor.AbstractChatMemoryAdvisor.CHAT_MEMORY_CONVERSATION_ID_KEY;
@@ -25,25 +29,51 @@ public class LoveApp {
             "围绕单身、恋爱、已婚三种状态提问:单身状态询问社交圈拓展及追求心仪对象的困扰;" +
             "恋爱状态询问沟通、习惯差异引发的矛盾;已婚状态询问家庭责任与亲属关系处理的问题。" +
             "引导用户详述事情经过、对方反应及自身想法，以便给出专属解决方案。";
-    private final ChatClient chatClient;
+    private final ChatModel dashscopeChatModel;
+    private ChatClient chatClient;
+    //注入自己定义的本地向量库
     @Resource
     private VectorStore loveAppVectorStore;
+    //注入云知识库顾问
     @Resource
     private Advisor loveAppRagCloudAdvisor;
+    @Value("classpath:system_prompt/system.txt")
+    private org.springframework.core.io.Resource systemPrompt;
 
     /**
      * 初始化 AI 客户端
      *
      * @param dashscopeChatModel 阿里灵积模型
      */
+//    public LoveApp(ChatModel dashscopeChatModel) throws IOException {
+//        //初始化基于内存的对话记忆
+//        ChatMemory chatMemory = new InMemoryChatMemory();
+//        //基于文件的对话记忆
+//      String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
+//       ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
+//        chatClient = ChatClient.builder(dashscopeChatModel).
+//                defaultSystem(systemPrompt.getContentAsString(StandardCharsets.UTF_8))
+//                .defaultAdvisors(
+//                        new MessageChatMemoryAdvisor(chatMemory),
+//                        new MyLoggerAdvisor()
+//                )
+//                .build();
+//    }
+    //    }
     public LoveApp(ChatModel dashscopeChatModel) {
-        //初始化基于内存的对话记忆
+        this.dashscopeChatModel = dashscopeChatModel;
+    }
+
+    /**
+     * 在类初始化后 Bean初始化完成之前执行
+     *
+     * @throws IOException
+     */
+    @PostConstruct
+    public void init() throws IOException {
         ChatMemory chatMemory = new InMemoryChatMemory();
-        //基于文件的对话记忆
-//        String fileDir = System.getProperty("user.dir") + "/tmp/chat-memory";
-//        ChatMemory chatMemory = new FileBasedChatMemory(fileDir);
-        chatClient = ChatClient.builder(dashscopeChatModel).
-                defaultSystem(SYSTEM_PROMPT)
+        chatClient = ChatClient.builder(dashscopeChatModel)
+                .defaultSystem(systemPrompt.getContentAsString(StandardCharsets.UTF_8))
                 .defaultAdvisors(
                         new MessageChatMemoryAdvisor(chatMemory),
                         new MyLoggerAdvisor()

@@ -18,6 +18,8 @@ class LoveAppTest {
     private LoveApp loveApp;
     @Value("classpath:templates/system-prompt.st")
     private org.springframework.core.io.Resource systemPromptResource;
+    @Value("classpath:system_prompt/system.txt")
+    private org.springframework.core.io.Resource systemPrompt;
 
     @Test
     void contextLoads() {
@@ -60,5 +62,10 @@ class LoveAppTest {
     void doChatWithCLOUDRag() {
         String chatId = UUID.randomUUID().toString();
         String message = loveApp.doChatWithRag("帮我找一下射手座的信息", chatId);
+    }
+
+    @Test
+    void loadSystemPrompt() throws IOException {
+        System.out.println(systemPrompt.getContentAsString(StandardCharsets.UTF_8));
     }
 }
