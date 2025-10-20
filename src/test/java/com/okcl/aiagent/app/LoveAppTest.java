@@ -48,4 +48,17 @@ class LoveAppTest {
     void loadSource() throws IOException {
         log.info("Loaded system prompt from {}", systemPromptResource.getContentAsString(StandardCharsets.UTF_8));
     }
+
+    @Test
+    void doChatWithRag() {
+        String chatId = UUID.randomUUID().toString();
+        String message = loveApp.doChatWithRag("我单身了3个月，想找对象，但是没有找到合适的对象，希望得到建议", chatId);
+        log.info("message: {}", message);
+    }
+
+    @Test
+    void doChatWithCLOUDRag() {
+        String chatId = UUID.randomUUID().toString();
+        String message = loveApp.doChatWithRag("帮我找一下射手座的信息", chatId);
+    }
 }
