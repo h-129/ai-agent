@@ -39,6 +39,8 @@ public class LoveApp {
     private Advisor loveAppRagCloudAdvisor;
     @Value("classpath:system_prompt/system.txt")
     private org.springframework.core.io.Resource systemPrompt;
+    @Resource
+    private VectorStore pgVectorVectorStore;
 
     /**
      * 初始化 AI 客户端
@@ -134,6 +136,8 @@ public class LoveApp {
                 //.advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
                 //应用rag检索增强器 (基于云知识库)
                 .advisors(loveAppRagCloudAdvisor)
+                //应用rag检索增强器 (基于本地PgVector向量存储)
+                //.advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
                 .call().chatResponse();
         String text = chatResponse.getResult().getOutput().getText();
         log.info("text: {}", text);
