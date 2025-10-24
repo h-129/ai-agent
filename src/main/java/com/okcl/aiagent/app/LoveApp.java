@@ -6,6 +6,7 @@ import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
@@ -132,10 +133,10 @@ public class LoveApp {
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 //开启日志
                 .advisors(new MyLoggerAdvisor())
-                //使用自定义的Rag知识库
-                //.advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+                //使用自定义本地的Rag知识库
+                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
                 //应用rag检索增强器 (基于云知识库)
-                .advisors(loveAppRagCloudAdvisor)
+                //.advisors(loveAppRagCloudAdvisor)
                 //应用rag检索增强器 (基于本地PgVector向量存储)
                 //.advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
                 .call().chatResponse();

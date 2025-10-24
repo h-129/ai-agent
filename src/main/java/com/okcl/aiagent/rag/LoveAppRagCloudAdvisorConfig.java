@@ -27,7 +27,7 @@ public class LoveAppRagCloudAdvisorConfig {
         //文档检索器
         DashScopeDocumentRetriever dashScopeDocumentRetriever = new DashScopeDocumentRetriever(dashScopeApi, DashScopeDocumentRetrieverOptions
                 .builder()
-                .withIndexName(RagConstants.RAG_CLOUD_OBJ_INFO_INDEX)
+                .withIndexName(RagConstants.RAG_CLOUD_KNOWLEDGE_INDEX)
                 .build());
         // 构建并返回一个检索增强顾问实例
         // 使用dashScope文档检索器作为默认的文档检索组件

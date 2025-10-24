@@ -15,6 +15,8 @@ import java.util.Map;
 class PgVectorVectorStoreConfigTest {
     @Resource
     private VectorStore pgVectorVectorStore;
+    @Resource
+    private LoveAppDocumentLoader loveAppDocumentLoader;
 
     @Test
     void pgVectorVectorStore() {
@@ -27,5 +29,14 @@ class PgVectorVectorStoreConfigTest {
         //相似度查询
         List<Document> results = pgVectorVectorStore.similaritySearch(SearchRequest.builder().query("Spring").topK(5).build());
         Assertions.assertNotNull(results);
+    }
+
+    /**
+     * 添加本地文档到本地向量数据库
+     */
+    @Test
+    void addDocumentsToPgVectorVectorStore() {
+        List<Document> documents = loveAppDocumentLoader.loadMarkdowns();
+        pgVectorVectorStore.add(documents);
     }
 }
