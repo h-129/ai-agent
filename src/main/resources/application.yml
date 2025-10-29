@@ -5,6 +5,7 @@ server:
 spring:
   application:
     name: ai-agent
+  #    激活local配置
   profiles:
     active: local
   #数据源

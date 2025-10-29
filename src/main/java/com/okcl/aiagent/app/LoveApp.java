@@ -1,12 +1,13 @@
 package com.okcl.aiagent.app;
 
 import com.okcl.aiagent.advisor.MyLoggerAdvisor;
+import com.okcl.aiagent.rag.LoveAppRagCustomAdvisorFactory;
+import com.okcl.aiagent.rag.QueryRewrite;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
-import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
 import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
@@ -42,6 +43,8 @@ public class LoveApp {
     private org.springframework.core.io.Resource systemPrompt;
     @Resource
     private VectorStore pgVectorVectorStore;
+    @Resource
+    private QueryRewrite queryRewrite;
 
     /**
      * 初始化 AI 客户端
@@ -127,18 +130,24 @@ public class LoveApp {
 
     //AI RAG知识库问答
     public String doChatWithRag(String message, String chatId) {
+        //查询重写
+        String rewriteMessage = queryRewrite.doQueryWrite(message);
         ChatResponse chatResponse = chatClient.prompt()
-                .user(message)
+                //使用查询后的重写
+                .user(rewriteMessage)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
                 //开启日志
                 .advisors(new MyLoggerAdvisor())
                 //使用自定义本地的Rag知识库
-                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+                //.advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
                 //应用rag检索增强器 (基于云知识库)
                 //.advisors(loveAppRagCloudAdvisor)
                 //应用rag检索增强器 (基于本地PgVector向量存储)
                 //.advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
+                .advisors(LoveAppRagCustomAdvisorFactory.createLoveAppRagCustomAdvisor(
+                        loveAppVectorStore, "已婚"
+                ))
                 .call().chatResponse();
         String text = chatResponse.getResult().getOutput().getText();
         log.info("text: {}", text);
