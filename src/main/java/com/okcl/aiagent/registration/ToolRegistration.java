@@ -1,4 +1,4 @@
-package com.okcl.aiagent.Registration;
+package com.okcl.aiagent.registration;
 
 import com.okcl.aiagent.tools.*;
 import jakarta.annotation.Resource;
